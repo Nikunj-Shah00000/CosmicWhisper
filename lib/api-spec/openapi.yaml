@@ -1,0 +1,96 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: API specification
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: whisper
+    description: Whisper Wall anonymous group chat
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /whisper/messages:
+    get:
+      operationId: getWhisperMessages
+      tags: [whisper]
+      summary: Get recent whisper wall messages
+      description: Returns the last 50 messages from the whisper wall
+      responses:
+        "200":
+          description: List of messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/WhisperMessage"
+    post:
+      operationId: postWhisperMessage
+      tags: [whisper]
+      summary: Post a message to the whisper wall
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WhisperMessageInput"
+      responses:
+        "201":
+          description: Message created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WhisperMessage"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    WhisperMessage:
+      type: object
+      required: [id, anonId, text, emotion, timestamp]
+      properties:
+        id:
+          type: string
+        anonId:
+          type: string
+        text:
+          type: string
+        emotion:
+          type: string
+        timestamp:
+          type: string
+
+    WhisperMessageInput:
+      type: object
+      required: [text, emotion]
+      properties:
+        text:
+          type: string
+          minLength: 1
+        emotion:
+          type: string
